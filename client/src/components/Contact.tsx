@@ -18,7 +18,7 @@ const contactInfo = [
 
 // Web3Forms access key — user needs to register at web3forms.com
 // and replace with their own key for their email
-const WEB3FORMS_ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
+const WEB3FORMS_ACCESS_KEY = "bcac6012-a6f6-4330-aa80-82fe8841f90b";
 
 type FormStatus = "idle" | "sending" | "success" | "error";
 
