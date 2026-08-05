@@ -51,16 +51,40 @@ git remote add origin https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
 git push -u origin main
 ```
 
-## Deploy no Cloudflare Pages
+## Deploy no Cloudflare (Workers Builds, antigo "Pages")
 
-1. Acesse o [dashboard da Cloudflare](https://dash.cloudflare.com) → **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**.
-2. Selecione o repositório que você acabou de subir no GitHub.
-3. Configure o build com estes valores:
-   - **Framework preset**: Vite
+A Cloudflare unificou "Pages" dentro de "Workers" — todo projeto novo (mesmo estático) passa
+pelo Wrangler. O repositório já vem com um `wrangler.jsonc` configurado para isso.
+
+1. Acesse o [dashboard da Cloudflare](https://dash.cloudflare.com) → **Workers & Pages** →
+   **Create application** → **Connect to Git**.
+2. Selecione o repositório que você subiu no GitHub.
+3. Em **Settings → Build**, configure:
    - **Build command**: `npm run build`
-   - **Build output directory**: `dist`
+   - **Deploy command**: `npx wrangler deploy --assets=dist --compatibility-date=2026-08-05 --name=visao-empreendedora`
+
+   > Por que um comando de deploy explícito? O pipeline de build da Cloudflare às vezes
+   > aplica automaticamente um "adapter" para projetos Vite que gera um `wrangler.json`
+   > incompleto dentro de `dist/`, causando o erro
+   > `The assets property in your configuration is missing the required directory property`.
+   > Passar `--assets`, `--compatibility-date` e `--name` diretamente na linha de comando
+   > evita depender desse arquivo gerado e resolve o problema. Se preferir tentar sem essas
+   > flags primeiro, o comando padrão `npx wrangler deploy` (usando o `wrangler.jsonc` da
+   > raiz) também funciona localmente — mas se dermos de cara com o mesmo erro no build da
+   > Cloudflare, troque para o comando explícito acima.
+
 4. Não é necessário configurar nenhuma variável de ambiente — o site não usa nenhuma.
 5. Clique em **Save and Deploy**. A cada push na branch `main`, a Cloudflare publica automaticamente.
+
+### Testando o deploy localmente antes de configurar no dashboard
+
+```bash
+npm run build
+npx wrangler deploy --dry-run --assets=dist --compatibility-date=2026-08-05 --name=visao-empreendedora
+```
+
+Se aparecer `✨ Read N files from the assets directory ... --dry-run: exiting now.` sem erros,
+está tudo certo.
 
 ## Estrutura do projeto
 
